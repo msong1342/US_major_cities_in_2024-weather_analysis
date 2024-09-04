@@ -27,7 +27,7 @@ def calculate_statistics(df):
         print("The 'Temperature_C' column is not present in the data.")
 
 if __name__ == "__main__":
-    file_name = r"C:\Users\msong\OneDrive\Documents\cs3270\weather_analysis/weather_data.csv"  # Ensure correct path
+    file_name = r"C:\Users\msong\OneDrive\Documents\cs3270\weather_analysis_project/weather_data.csv"  # Ensure correct path
     data_frame = module.csv_pandas(file_name)
     
     if data_frame is not None:

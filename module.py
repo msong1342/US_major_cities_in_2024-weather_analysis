@@ -67,6 +67,6 @@ def csv_pandas(file_name):
         return None
     
 if __name__ == "__main__":
-    file_name = r"C:\Users\msong\OneDrive\Documents\cs3270\weather_analysis/weather_data.csv"  # Ensure the correct path to your file
+    file_name = r"C:\Users\msong\OneDrive\Documents\cs3270\weather_analysis_project/weather_data.csv"  # Ensure the correct path to your file
     data_frame = csv_pandas(file_name)
 
