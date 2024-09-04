@@ -44,6 +44,12 @@ Ensure you have Python installed. You can use the package manager [pip](https://
 
 ```bash
 pip install pandas
+
 pip install numpy
+
 pip install setuptools
 
+pip install setuptools wheel
+
+python setup.py sdist bdist_wheel
+```

@@ -10,7 +10,7 @@ setup(
     description="A package for calculating descriptive statistics",
     long_description=open(r"C:\Users\msong\OneDrive\Documents\cs3270/readme.md").read(),
     long_description_content_type="text/markdown",
-    url="", # I have no idea what to put after this class decided not using git anymore,
+    url="https://github.com/msong1342/CS3270_UVU_Projects.git",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
