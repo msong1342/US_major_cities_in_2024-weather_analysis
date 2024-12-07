@@ -1,72 +1,53 @@
-"""
-Module - Weather Data Analysis
-"""
 import pandas as pd
 import csv
-import numpy as np
+import logging
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 
-csv_data = []
+logging.basicConfig(filename="weather_analysis.log", 
+                    level=logging.ERROR, 
+                    format="%(asctime)s - %(levelname)s - %(message)s")
 
-def open_file(file_name):
-    """
-    Reads a CSV file into a list.
+# Flask app setup
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather_app.db'
+db = SQLAlchemy(app)
 
-    Parameters:
-    file_name (str): The path to the CSV file.
+class WeatherData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(100), nullable=False)
+    date_time = db.Column(db.String(100), nullable=False)
+    temperature = db.Column(db.Float, nullable=False)
+    humidity = db.Column(db.Float, nullable=True)
+    precipitation = db.Column(db.Float, nullable=True)
+    wind_speed = db.Column(db.Float, nullable=True)
 
-    Returns:
-    list: Data read from the CSV file.
-    """
-    try:
-        with open(file_name, mode="r") as csvfile:
-            reader = csv.reader(csvfile)
-            data = list(reader)
-            add_to_weather_data(data)
-            return data
-    except FileNotFoundError:
-        print(f"Error: The file '{file_name}' was not found.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+class DataFetcher:
+    def __init__(self, file_name):
+        self.file_name = file_name
 
-def add_to_weather_data(reader):
-    """
-    Appends each row of CSV data to the csv_data list.
+    def csv_pandas(self):
+        """Reads a CSV file into a pandas DataFrame."""
+        try:
+            data_frame = pd.read_csv(self.file_name)
+            data_frame.columns = data_frame.columns.str.strip()
+            return data_frame
+        except Exception as e:
+            logging.error(f"Error reading CSV: {e}")
+            return None
 
-    Parameters:
-    reader (csv.reader): CSV reader object.
-
-    Returns: None
-    """
-    for lines in reader:
-        csv_data.append(lines)
-
-def csv_pandas(file_name):
-    """
-    Reads a CSV file into a DataFrame using pandas.
-
-    Parameters:
-    file_name (str): The path to the CSV file.
-
-    Returns:
-    pd.DataFrame: Data from the CSV file.
-    """
-    try:
-        data_frame = pd.read_csv(file_name)
-        return data_frame
-    except FileNotFoundError:
-        print(f"Error: The file '{file_name}' was not found.")
-        return None
-    except pd.errors.EmptyDataError:
-        print(f"Error: The file '{file_name}' is empty.")
-        return None
-    except pd.errors.ParserError:
-        print(f"Error: The file '{file_name}' could not be parsed.")
-        return None
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return None
-    
-if __name__ == "__main__":
-    file_name = r"C:\Users\msong\OneDrive\Documents\cs3270\weather_analysis_project/weather_data.csv"  # Ensure the correct path to your file
-    data_frame = csv_pandas(file_name)
-
+def populate_database(file_name):
+    fetcher = DataFetcher(file_name)
+    data_frame = fetcher.csv_pandas()
+    if data_frame is not None:
+        for _, row in data_frame.iterrows():
+            weather_entry = WeatherData(
+                location=row['Location'],
+                date_time=row['Date_Time'],
+                temperature=row['Temperature_C'],
+                humidity=row['Humidity_pct'],
+                precipitation=row['Precipitation_mm'],
+                wind_speed=row['Wind_Speed_kmh']
+            )
+            db.session.add(weather_entry)
+        db.session.commit()
